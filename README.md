@@ -4,6 +4,33 @@ A collection of things I learned today.
 
 
 ## 2025年
+### 8月28日
+- picoCTF
+  - zsteg を使ってみました。できることは以下。
+   1. LSB (Least Significant Bit) 解析
+   2. ファイルヘッダーの検出
+   3. ​隠されたテキストの抽出
+  - `echo "見つかったbase64文字列" | base64 -d`でbase64デコードができる。
+  - ​.pcapファイルはパケットキャプチャファイルをwiresharkとtsharkで解析。tcpペイロードを取り出す。
+  - sha256sumでハッシュ値を生成する。
+  - zbar-toolsでQRコードを解析する。
+- Windowsのシステム整合性修復の方法を学びました。  
+```
+ログチェック:イベントビューア
+診断：DISM /Online /Cleanup-image /ScanHealth
+​修復：DISM /Online /Cleanup-image /RestoreHealth
+​システムファイルの整合性チェック：sfc /scannow
+```
+- wingetのアップデート問題：メジャーバージョンアップグレードの特性を理解して手動で対応
+- ログイン前のキーボード設定の修正方法を学びました。  
+`sudo vim /etc/default/keyboard``sudo dpkg-reconfigure keyboard-configuration
+`
+- サイバーセキュリティ
+  - 侵入方法とRaaSの分業体制を学びました。  
+攻撃者は侵入と権限昇格までを行い、RaaSとは分業である。RaaSはLiving off the Land、certutilやbitsadmin、MWIなど標準ツールの悪用が主流となっている。
+
+
+
 ### 8月27日
 - Git＆GitHub
   - Gitのコマンドについて学習しました。`git add .`の危険性を理解し、`git add <file>`の重要性を学びました。  
