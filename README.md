@@ -4,6 +4,28 @@ A collection of things I learned today.
 
 
 ## 2025年
+### 9月3日
+ - springboot
+   - レイアウトを改善するにはBootstrapやTailwindCSSが適している。手軽なのはBootstrapで`<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" `をheadに追加するだけ。
+   - ログアウト時はSessionやCookieを無効にする処理を入れる。
+```
+.logoutSuccessUrl("/login?logout")
+.invalidateHttpSession(true)
+.deleteCokkies("JSESSIONID")
+```
+   - 親子テーブルを関連付ける場合は@OneToMany,@ManyToOne,@JoinColumnアノテーションをエンティのキーに付与する。
+
+- ​顔認証とログイン: 顔認証は、端末のロック解除だけでなく、アプリやサービスへのログインにも使われる。
+- ​多要素認証（MFA）: SMS認証やメール認証はフィッシングに弱い。顔認証のような生体認証は、デバイス内で認証が完結するため、フィッシング耐性が高い。
+- ​パスキー: デバイスの生体認証と公開鍵暗号技術を組み合わせた、フィッシングに非常に強い新しい認証方式。
+- ​Javaの環境変数: Oracleの公式JDKインストーラーは環境変数を自動設定しないため、手動設定が必要な場合がある。Scoopのようなパッケージマネージャーを使うと、この作業を自動化できて便利。
+- ​GitHubのセキュリティ:
+​ライセンス: GitHubのWebサイトから、後付けでライセンス（例: MIT）を簡単に設定できる。
+- ​Dependabot: 依存ライブラリの脆弱性を自動でスキャンしてくれるツール。HighやCriticalな脆弱性が見つかった場合は、優先的に対応する。
+- ​履歴の削除: 履歴をまっさらにしたい場合は、git checkout --orphanコマンドで履歴のない新しいブランチを作り、git push -fで強制的に上書きする。事前に.gitignoreが正しく設定されているか確認することが重要。
+- IDEの機能: Android StudioにはMarkdownのプレビュー機能が標準で搭載されていないが、VS Codeのような他のエディタや、IntelliJ IDEAには標準で搭載されている。
+
+
 ### 9月2日
 - Springboot
   - spring-boot-starter-security: セキュリティのコアライブラリ。追加するだけで自動的に基本的なログインフォームと認証機能が有効になる。
