@@ -2,6 +2,9 @@
 A collection of things I learned today.  
 今日学んだことの記録を書いていきます。
 
+[セキュリティ関連の考察・分析はこちらです。](security.md)
+
+---
 
 ## 2025年
 ### 9月4日
