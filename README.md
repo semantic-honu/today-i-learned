@@ -4,6 +4,20 @@ A collection of things I learned today.
 
 
 ## 2025年
+### 9月4日
+ - セキュリティ
+   -​ CVE-2025-9074の概要
+      - ​影響を受ける製品: Docker Desktop for WindowsおよびmacOS
+​脆弱性の種類: コンテナからの特権昇格（コンテナエスケープ）。
+      - ​脆弱性の詳細:
+デフォルト設定のDockerサブネット経由で、悪意のあるローカルのコンテナが、認証なしでDocker EngineのAPIに直接アクセスできてしまう脆弱性です。
+      - ​なぜ危険か:
+この脆弱性を悪用されると、攻撃者はコンテナ内からホスト側のDocker Engineを制御できるようになります。これにより、他のコンテナを操作したり、新しいコンテナを作成したり、さらにはホストのドライブをマウントして、ホストOS上のファイルにアクセスすることが可能になります。
+      - ​CVSSスコア:
+脆弱性の深刻度を示すCVSSv4.0のベーススコアは9.3で、最も高い「Critical（クリティカル）」に分類されています。
+    - 考察：​開発・検証ツールであるDocker Desktopが本番運用されることは通常あり得ない。しかし、現実にはそのようなケースが存在し、脆弱な状態が放置されるリスクがある。セキュリティは技術的な対策だけでなく、組織や人間の運用まで含めて考えるべき。
+
+
 ### 9月3日
  - springboot
    - レイアウトを改善するにはBootstrapやTailwindCSSが適している。手軽なのはBootstrapで`<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" `をheadに追加するだけ。
