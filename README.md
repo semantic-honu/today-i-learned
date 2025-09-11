@@ -7,6 +7,88 @@ A collection of things I learned today.
 ---
 
 ## 2025年
+### 9月10日 
+
+#### Spring Boot テスト関連
+
+- `@WebMvcTest(.class)`  
+  Spring MVC（Web層）のみを対象にしたテスト用アノテーション。  
+  コントローラー単体の動作検証ができ、サービス層やDBはMockで差し替える必要あり。  
+  MockMvcが自動で使える（HTTPリクエストのシミュレーションが可能）。
+
+- `@Import(.class)`  
+  @WebMvcTestは必要最小限のBeanしか読み込まないため、セキュリティ設定は除外される。  
+  コントローラーが@PreAuthorizeやSecurityContextを使う場合、@Importで明示的に設定を追加する。
+
+- `@BeforeEach`（JUnit）  
+  各テストメソッドの前に毎回実行される処理を定義するアノテーション。  
+  テストごとに新鮮な状態で使える。
+
+- `when(...).thenReturn(...)`（Mockito）  
+  モックの振る舞い定義。  
+  例：userRepository.findByUsername(...)が呼ばれたとき、Optional.of(...)を返す。
+
+- `@Test`  
+  JUnitの基本アノテーション。テストメソッドであることを示す。
+
+- `@WithMockUser(username = ...)`  
+  Spring Securityのテスト用アノテーション。  
+  ログイン済みユーザーとしてテストを実行する。
+
+- テスト構成例  
+  | 層         | テスト内容                                   | 優先度         |
+  |------------|--------------------------------------------|----------------|
+  | Controller | レスポンス、ビュー名、モデル属性            | 高             |
+  | Service    | ロジック分岐、例外処理、依存のモック        | 高             |
+  | Repository | クエリ動作確認（@DataJpaTest）              | 中〜低（複雑なら高） |
+  | Security   | 認証・認可動作確認（@WithMockUserなど）     | 中             |
+  | Integration| 全体の流れ（@SpringBootTest）               | 中（必要に応じて）   |
+
+- `mockMvc.perform(post(...)...)`  
+  POSTへの仮想リクエスト。  
+  .with(csrf())でCSRFトークンを付与（Spring Security有効時は必須）。  
+  .paramでフォーム値指定。  
+  .andExpect(status().is3xxRedirection())でリダイレクト確認。  
+  .andExpect(redirectedUrl(...))でリダイレクト先確認。
+
+- Controllerテストで確認すべきこと  
+  - ビュー名
+  - ステータスコード
+  - モデル属性
+  - リダイレクト先
+  - セキュリティ制約
+
+- Controllerテストで確認しないこと  
+  - DB保存（Service/Repository層の責任）
+  - ビジネスロジックの詳細分岐
+
+#### HTTPステータスコード「3xx」
+
+| ステータス | 名前                | 意味                                 |
+|------------|---------------------|--------------------------------------|
+| 300        | Multiple Choices    | 複数の選択肢（ほぼ使われない）       |
+| 301        | Moved Permanently   | 恒久的に移動（URL変更）              |
+| 302        | Found               | 一時的に別の場所（よく使われる）     |
+| 303        | See Other           | POST後にGETで別URLへ                 |
+| 307        | Temporary Redirect  | 一時的リダイレクト（メソッド保持）   |
+| 308        | Permanent Redirect  | 恒久的リダイレクト（メソッド保持）   |
+
+- `.is3xxRedirection()`  
+  MockMvcの.andExpect(status().is3xxRedirection())は、ステータスコードが300〜399の範囲であることを確認。  
+  より厳密に確認したい場合は`.isFound()`（302）や`.isSeeOther()`（303）なども利用可能。
+
+#### Microsoft 365 E5 Security
+
+- 単なるウイルス対策ではなく、EDR（端末防御）、NDR（ネットワーク監視）、SIEM（Microsoft Sentinel）まで網羅する統合セキュリティソリューション。
+- UTMがネットワークの出入り口を守るのに対し、クラウドや端末まで多層防御を実現する中心的役割。
+- AI活用で脅威検知・対応を自動化。
+
+- 注意点
+  - 完璧ではない。設定ミスや人為的脆弱性、シャドーITなどがセキュリティの穴になる。
+  - 製品の「できること」だけでなく「できないこと」にも注目する。
+  - 継続的な運用（棚卸し、見直し、教育）が不可
+
+
 ### 9月9日
 
 - フロントエンドとバックエンドの分業化
