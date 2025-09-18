@@ -7,6 +7,68 @@ A collection of things I learned today.
 ---
 
 ## 2025年
+### 9月17日
+
+#### アノテーションと引数の意味
+
+- `@PostMapping("/tasks/{id}/delete")`
+    - HTTP POSTリクエストで `/tasks/123/delete` のようなURLにアクセスされたときに呼び出される。
+    - `{id}` はURLの一部で、削除したいタスクのID。
+- `@PathVariable Long id`
+    - URLの `{id}` の部分を `Long id` にマッピングする。
+- `@AuthenticationPrincipal UserDetails userDetails`
+    - Spring Securityがログイン中のユーザー情報を `userDetails` に注入する。
+    - ここから「誰が操作しているか」を取得する。
+
+#### メソッドの中身の流れ
+
+- `User currentUser = getCurrentUser(userDetails);`
+    - `userDetails` からアプリケーション独自の `User` オブジェクトに変換。
+    - DBから `User` を取得するメソッド。
+- `taskRepository.findByIdAndUser(id, currentUser)`
+    - タスクIDとユーザーを指定して、そのユーザーが所有するタスクかどうか確認。
+    - `Optional<Task>` が返る。
+- `.ifPresent(taskRepository::delete);`
+    - タスクが存在すれば削除。存在しなければ何もしない。
+
+
+#### `taskRepository::delete` の意味
+
+- `taskRepository.delete(...)` を関数として渡している。
+- ラムダ式 `task -> taskRepository.delete(task)` と同じ意味。
+- `Optional<Task>` に対して、中身が存在すれば削除処理を実行。
+
+
+#### `::` の使い方のパターン
+
+| 使い方 | 意味 | 例 |
+|--------|------|----|
+| `ClassName::staticMethod` | 静的メソッド参照 | `Math::max` |
+| `object::instanceMethod` | インスタンスメソッド参照 | `taskRepository::delete` |
+| `ClassName::new` | コンストラクタ参照 | `ArrayList::new` |
+
+- `return "redirect:/";`
+    - 削除後はトップページ（`/`）にリダイレクト。
+
+#### まとめ：何が渡ってきてどうなるか
+
+| 渡ってくるもの | どこから | 何に使われるか |
+|----------------|----------|----------------|
+| `id`           | URL      | 削除対象のタスクID |
+| `userDetails`  | Spring Security | ログインユーザーの情報 |
+| `currentUser`  | `getCurrentUser()` | DB上のユーザー情報 |
+| `task`         | `findByIdAndUser()` | ユーザーが所有するタスクか確認 |
+| `taskRepository::delete` | Optionalが存在する場合 | タスクを削除 |
+
+#### `.tar.gz`展開の学び（Windows環境）
+
+- `.tar.gz` は圧縮（.gz）＋アーカイブ（.tar）の二段構え。展開には段階的な処理が必要。
+- Windows標準機能ではメモリ不足に陥ることも。1.6GBのファイル展開でOOM（Out of Memory）を経験。
+- 7-Zipで展開成功。ストリーム処理によりメモリ消費が抑えられた。
+
+
+
+
 ### 9月15日
 
 #### JavaScriptのプロトコルと`<script>`タグの違い
