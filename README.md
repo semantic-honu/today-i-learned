@@ -1,4 +1,5 @@
 # today-i-learned
+
 A collection of things I learned today.  
 今日学んだことの記録を書いていきます。
 
@@ -8,7 +9,6 @@ A collection of things I learned today.
 
 ## 2025年
 
----
 
 ### 9月17日
 
