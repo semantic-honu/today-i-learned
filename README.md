@@ -7,6 +7,9 @@ A collection of things I learned today.
 ---
 
 ## 2025年
+
+---
+
 ### 9月17日
 
 #### アノテーションと引数の意味
