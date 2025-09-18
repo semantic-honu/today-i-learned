@@ -67,7 +67,33 @@ A collection of things I learned today.
 - 7-Zipで展開成功。ストリーム処理によりメモリ消費が抑えられた。
 
 
+### 9月16日
+# GitHub ActionsでSASTとDASTをCI/CDに組み込む方法
 
+- **SAST (静的解析)** はGitHub Code Scanningを使えばすぐに始められる  
+  - Settings → Code security and analysis → Code Scanning の「Set up」  
+  - 自動生成される `codeql-analysis.yml` により、PRやpush時にCodeQLでスキャンが走る  
+  - 結果はリポジトリの「Security」タブで確認可能  
+
+- **DAST (動的解析)** はOWASP ZAPをActionsに組み込む  
+  - ステージング環境にデプロイ → OWASP ZAPをコンテナで実行  
+  - `docker-actions/zap-scans` を利用し、対象URLを指定してスキャン  
+  - 例:  
+    ```yaml
+    jobs:
+      dast:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Deploy to Staging
+            run: echo "Deploying..."
+          - name: Run DAST scan
+            uses: docker-actions/zap-scans@v1
+            with:
+              target: 'https://your-staging-app.example.com'
+    ```
+
+これで、GitHub ActionsのCI/CDパイプラインにセキュリティテストを自動組み込みできる。  
+Dependabotと組み合わせれば依存関係の脆弱性管理もスムーズ。
 
 ### 9月15日
 
