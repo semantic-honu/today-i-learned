@@ -8,6 +8,46 @@ A collection of things I learned today.
 ---
 
 ## 2025年
+### 10月3日
+
+- **Singletonパターン**は、クラスのインスタンスが一つだけ存在することを保証し、グローバルなアクセスポイントを提供する。  
+  - モダンJavaでは、`Enum`を使うことでスレッドセーフ・シリアライズ安全・リフレクション耐性を簡単に実現できる。
+  - 例:  
+    ```java
+    public enum ConfigManager {
+        INSTANCE;
+        private String setting = "Default Value";
+        public String getSetting() { return setting; }
+        public void updateSetting(String newSetting) { this.setting = newSetting; }
+    }
+    ```
+
+- **Factory Methodパターン**は、インスタンス生成の処理をサブクラスに委譲し、クライアントが生成方法を知らなくても済むようにする。  
+  - レガシーな実装では`if-else`や`switch`で分岐しがちだが、OCP（開閉原則）違反になりやすい。
+  - 継承ベースのファクトリーメソッドでは、生成ロジックを抽象化し、拡張性を高めることができる。
+
+- **モダンJavaのFactory実装**では、`Supplier`と`Map`を使い、ラムダ式で生成処理を登録することで、クラスの増加を防ぎ、柔軟かつ簡潔な実装が可能。  
+  - 例:  
+    ```java
+    private static final Map<String, Supplier<Product>> FACTORY_MAP = new HashMap<>();
+    static {
+        FACTORY_MAP.put("A", ConcreteProductA::new);
+        FACTORY_MAP.put("B", () -> new ConcreteProductB());
+    }
+    public static Product createProduct(String type) {
+        Supplier<Product> supplier = FACTORY_MAP.get(type);
+        if (supplier == null) throw new IllegalArgumentException("Invalid product type: " + type);
+        return supplier.get();
+    }
+    ```
+
+- **Decoratorパターン**は、オブジェクトに機能を動的に追加できる構造パターン。  
+  - 柔軟な拡張が可能で、既存コードを変更せずに振る舞いを追加できる。
+
+
+
+
+
 ### 9月28日
 
 - GoogleのJavaScript難読化についてTIL
