@@ -70,13 +70,13 @@ jobs:
     name: Run SAST
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run GitHub Code Scanning
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: javascript
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
 
   dast:
     name: Run DAST
@@ -86,11 +86,10 @@ jobs:
       - name: Deploy to Staging (仮)
         run: echo "Deploying to staging environment..."
       - name: Run DAST scan
-        uses: docker-actions/zap-scans@v1
+        uses: zaproxy/action-full-scan@v0.10.0
         with:
           target: 'https://my-staging-app'
 ```
-
 
 
 
