@@ -8,6 +8,92 @@ A collection of things I learned today.
 ---
 
 ## 2025年
+### 10月6日 
+
+- RenderからAWSへの移行
+    - JavaアプリケーションはAWSのEC2やECSにデプロイ可能
+    - H2 Database（インメモリ）は個人開発向き
+        - AWS移行時はRDS（PostgreSQLやMySQL等）など永続化DBに置き換えが必要
+    - Docker利用はコンテナ化されている証拠
+        - AWSではECSやEKSでスムーズに移行可能
+
+- ブランチ名の理解
+    - main/master：最も安定したリリース済みコードのブランチ
+    - develop：新機能がマージされるテスト・統合用ブランチ
+    - feature/branch-name：新機能開発用ブランチ
+    - Gitflow：コードベースを整理するためのブランチ運用システム
+
+- AWSでの環境変数管理方法
+    - AWS Systems Manager Parameter Store
+        - 設定データやパスワード等の機密情報を安全に保存
+        - .envファイルの内容をここに保存し、アプリ起動時に読み込む
+    - AWS Secrets Manager
+        - データベース認証情報等を高セキュリティで管理
+        - パスワード自動ローテーション機能あり
+    - これらを使うことで、パスワード等がコードや設定ファイルに直接書かれず、セキュリティ向上
+
+### 10月5日
+
+GitHub Actionsを使ってパイプラインにセキュリティテスト（SAST/DAST）を組み込む方法を学んだ。
+
+#### 1. SASTの導入（GitHub Code Scanning）
+
+- GitHubのCode Scanning（SAST）は、追加ツール不要ですぐ使える。
+  - リポジトリの「Settings」→「Code security and analysis」へ進む。
+  - 「GitHub Actions」のCode Scanningセクションで「Set up」をクリック。
+    - `.github/workflows/codeql-analysis.yml`が自動作成される。
+    - プルリクや特定ブランチへのpush時にCodeQLで自動スキャン。
+  - ファイルをコミット。
+  - スキャン結果は「Security」タブで確認可能。
+
+#### 2. DASTの導入（OWASP ZAP）
+
+- DASTはデプロイ済みアプリに対して実行するため、SASTより設定が必要。
+  - `.github/workflows`にDAST用ワークフローを新規作成 or 既存ファイルにジョブ追加。
+  - ジョブ例：
+    - ステージング環境へデプロイ（例：RenderのAPIを呼び出す）。
+    - OWASP ZAPをdocker-actions/zap-scansなどで実行。
+    - スキャン対象URL（例：`https://my-staging-app`）を指定。
+
+#### サンプルワークフロー
+
+```yaml
+name: CI/CD Pipeline with Security
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sast:
+    name: Run SAST
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run GitHub Code Scanning
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  dast:
+    name: Run DAST
+    needs: sast
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Staging (仮)
+        run: echo "Deploying to staging environment..."
+      - name: Run DAST scan
+        uses: docker-actions/zap-scans@v1
+        with:
+          target: 'https://my-staging-app'
+```
+
+
+
+
 ### 10月3日
 
 - **Singletonパターン**は、クラスのインスタンスが一つだけ存在することを保証し、グローバルなアクセスポイントを提供する。  
