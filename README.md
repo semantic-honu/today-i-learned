@@ -8,6 +8,78 @@ A collection of things I learned today.
 ---
 
 ## 2025年
+### 2025年10月30日
+
+## Decoratorパターンの基本構造を示すJavaコード例
+
+以下に、Decoratorパターンの基本構造を示すJavaコード例を示します。この例では、コーヒーにミルクを追加する機能をデコレーターとして実装しています。
+
+
+```java
+// 1. Component（共通のインターフェース）
+public interface Beverage {
+    long getCost();
+}
+
+// 2. ConcreteComponent（飾られる主役）
+public class SimpleCoffee implements Beverage {
+    @Override
+    public long getCost() {
+        return 300; // シンプルなコーヒーの価格
+    }
+}
+
+// 3. Decorator（装飾の基底クラス）
+public abstract CondimentDecorator implements Beverage {
+    protected Beverage beverage;
+
+    public CondimentDecorator(Beverage beverage) {
+        this.beverage = beverage;
+    }
+
+    @Override
+    public abstract long getCost();
+}
+
+// 4. ConcreteDecorator（具体的な装飾クラス）
+public class MilkDecorator extends CondimentDecorator {
+    public MilkDecorator(Beverage beverage) {
+        super(beverage);
+    }
+
+    @Override
+    public long getCost() {
+        return beverage.getCost() + 50; // ミルクの追加料金
+    }
+}
+
+// 5. Client（利用者）
+public class Executor {
+    public static void main(String[] args) {
+        Beverage beverage = new SimpleCoffee();
+        System.out.println("Simple Coffee Cost: " + beverage.getCost() + " yen");
+
+        beverage = new MilkDecorator(beverage);
+        System.out.println("Coffee with Milk Cost: " + beverage.getCost() + " yen");
+    }
+}
+```
+
+### メリット
+
+1. テストの容易性（網羅率の向上）
+   レガシーな if: Coffee クラスの getCost() メソッド一つをテストするために、「ミルクなし」「ミルクあり」「ホイップあり」「ミルクとホイップあり」といった全ての組み合わせのパターンをテストコードで網羅しなければなりません。組み合わせが増えるほど、テストケースは指数関数的に増大します。
+
+   デコレーター: MilkDecorator は「元のコストに50円足す」という一つの単純な機能だけを持っています。このクラスのテストは、他のトッピングの状態に関係なく、この「50円足す」ロジックが正しいことだけを確認すれば済みます。テストがシンプルになり、網羅率を極めて簡単に高く保てるようになります。
+
+2. 機能の分離と再利用
+   デコレーターは、「機能（振る舞い）」そのものをクラス（オブジェクト）として分離し、データとして組み合わせることを可能にしました。
+
+   MilkDecorator クラスは、どこでも再利用できる「ミルクを追加する機能」そのものです。
+
+   「既存のコードを修正せずに、機能を追加できる（開閉原則）」というメリットと、「機能が分離されたことで、テストが容易になる」というメリットは、セットで考えるべきモダンな設計思想の基本です。
+## 
+
 ### 10月26日
 #### モダンシステムが吐き出すべきログ
 ベストプラクティスでは、システムを安全かつ効率的に運用するために、以下の3種類のデータを出すことが求められる。これらは "The Three Pillars of Observability" と呼ばれる。
