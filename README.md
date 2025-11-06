@@ -8,6 +8,70 @@ A collection of things I learned today.
 ---
 
 ## 2025年
+### 11月6日
+
+#### TIL: AWS Cognito × API Gateway × Lambdaでサーバーレス認証・認可を実装した
+
+#### 1. Cognitoでユーザー認証の基盤を構築
+
+- ユーザープールを作成し、Eメール認証・MFAなし・SPA向けクライアント設定（機密クライアントOFF）でセットアップ。
+- ユーザープールID・アプリクライアントIDを控える。
+- テストユーザーを作成し、AWS CLIやPostmanでログインAPI（AdminInitiateAuth/InitiateAuth）を叩いてJWTトークン取得を確認。
+
+#### 2. Lambdaで認可ロジック（BOLA対策）を実装
+
+- Lambda関数をNode.js/Pythonで作成。
+- API Gateway経由でevent.requestContext.authorizer.claims.subから認証済みユーザーIDを取得。
+- リクエストされたリソースID（event.pathParameters.resourceId）とDB照合し、所有者のみアクセス許可。
+- 所有者でなければ403 Forbiddenを返す。
+
+```javascript
+exports.handler = async (event) => {
+    const authenticatedUserId = event.requestContext.authorizer.claims.sub;
+    const requestedResourceId = event.pathParameters.resourceId;
+    const isOwner = await checkResourceOwnership(authenticatedUserId, requestedResourceId);
+
+    if (!isOwner) {
+        return {
+            statusCode: 403,
+            body: JSON.stringify({ message: "Access Denied: You are not the owner of this resource." }),
+        };
+    }
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ message: `Resource ${requestedResourceId} for user ${authenticatedUserId}` }),
+    };
+};
+```
+
+#### 3. API GatewayでCognito認証とLambda統合
+
+- REST APIを作成し、リソース/メソッド（例: /resource/GET）を追加。
+- Cognitoオーソライザーを設定し、AuthorizationヘッダーからJWTを検証。
+- メソッドリクエストで認可をCognitoオーソライザーに変更。
+- 統合リクエストでLambda関数を指定し、APIをデプロイ。
+
+#### 4. 動作検証
+
+- テストユーザーでJWTトークン取得。
+- Authorizationヘッダー付きでAPI Gatewayにリクエスト → 200 OK（認証成功）。
+- Authorizationヘッダーなし/無効 → 401 Unauthorized（API Gatewayで認証失敗）。
+- 他ユーザーのリソースをリクエスト → 403 Forbidden（Lambdaで認可失敗/BOLA対策）。
+
+#### 5. VTL（Velocity Template Language）でのclaims取得の違い
+
+- Lambda非統合時: `$input.json('$.context.authorizer.claims')`（非推奨）
+- Lambda Proxy Integration時: `$context.authorizer.claims`（推奨）
+
+#### 6. サーバーレスセキュリティで学んだこと
+
+- Bearer Token形式の厳密さ、IAM権限不足によるLambda未実行、VTLでのclaims/パスパラメータ抽出の落とし穴を体験。
+- 403エラー時の階層的な原因切り分け（API Gateway統合・Lambdaコード以前の問題）を習得。
+
+
+
+
 ### 11月1日
 Mandiantの「特権アカウント監視のための防御者ガイド」を通じて、現代の防御戦略の核を理解した。
  * 究極の防御は「特権アカウントの保護」に集約される
